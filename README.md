@@ -8,7 +8,7 @@ This page serves as a note for my API development and the content of this page i
 |--------|---------------------------------------|
 |1       |[Type of APIs](#API-Comparison)        |
 |2       |[Setting up DJango](#Setup-Django)     |
-|2.3     |[Executing DJango](#1.3)-Run-Django)   |
+|2.3     |[Executing DJango](#Run-Django)        |
 
 ## API Comparison
 There are 3 frequently used APIs are coded in python, mainly ```DJango```, ```Flask Framework```, and ```Fast API```.  
