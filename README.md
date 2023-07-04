@@ -4,7 +4,7 @@ This page serves as a note for my API development and the content of this page i
 
 
 ## Table of Content
-|===================================================|
+|-------------------------------|
 |[Type of APIs](#API-Comparison)|
 
 ## API Comparison
