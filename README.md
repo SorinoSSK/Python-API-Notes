@@ -4,9 +4,11 @@ This page serves as a note for my API development and the content of this page i
 
 
 ## Table of Content
-|s/n     |Title                          |
-|--------|-------------------------------|
-|1       |[Type of APIs](#API-Comparison)|
+|S/N     |Title                                  |
+|--------|---------------------------------------|
+|1       |[Type of APIs](#API-Comparison)        |
+|2       |[Setting up DJango](#Setup-Django)     |
+|2.3     |[Executing DJango](#)
 
 ## API Comparison
 There are 3 frequently used APIs are coded in python, mainly ```DJango```, ```Flask Framework```, and ```Fast API```.  
@@ -27,31 +29,30 @@ Since Fast API is rather new, the security of the framework maybe lacking.
 
 ## Django Tutorial
 Django is a web framework and it can be used to build APIs using python. There are other options to build API on such as Flask API and FastAPI. In this section, Django is used due to scalability.  
-
-By default, Django works on sqlite. However, it can be changed to meet the needs of users.
+By default, Django works on sqlite. However, it can be changed to meet the needs of users.  
 
 ### Setup Django
-**1.1) Install Django**
+#### 1.1) Install Django
 ```
 python -m pip install django
 ```
-**1.2) Create Django project**
+#### 1.2) Create Django project
 A folder (projectName) will be created after the command shown below is executed. The folder will consist of another (projectName) folder and a manage.py file.
 ```
 django-admin startproject (projectName)
 ```
-**1.3) Run Django**
+#### 1.3) Run Django
 ```
 python manage.py runserver
 ```
-**1.4) Create API app**  
+#### 1.4) Create API app
 There is a practice to create API folder seperately from Django project. Thus if the project do not require the creation of another folder, then this step can be skipped.
 ```
 python manage.py startapp (folderName)
 ```
 After the command above is executed, you will have a few an additional folder, (folderName) as compared to **1.2)**.
 
-**1.5) Add directory of the newly created folder into the main Django project.**  
+#### 1.5) Add directory of the newly created folder into the main Django project.
 Modify the following section in ```(projectName)/settings.py```. If the project do not require the creation of another folder, this step can be skipped too.
 ```
 INSTALLED_APPS = [
