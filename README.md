@@ -4,11 +4,12 @@ This page serves as a note for my API development and the content of this page i
 
 
 ## Table of Content
-|S/N     |Title                                  |
-|--------|---------------------------------------|
-|1       |[Type of APIs](#API-Comparison)        |
-|2       |[Setting up DJango](#Setup-Django)     |
-|2.3     |[Executing DJango](#13-run-django)        |
+|S/N     |Title                                                            |
+|--------|-----------------------------------------------------------------|
+|1       |[Type of APIs](#API-Comparison)                                  |
+|2       |[Setting up DJango](#Setup-Django)                               |
+|2.1     |[Executing DJango](#13-run-django)                               |
+|3       |[Changeing Database for DJango](#Changing-databases-for-django)  |
 
 ## API Comparison
 There are 3 frequently used APIs are coded in python, mainly ```DJango```, ```Flask Framework```, and ```Fast API```.  
@@ -61,12 +62,12 @@ INSTALLED_APPS = [
     # Do not remove other installed configuration. Replace (projectName) with your own and note the caps for the parameter with config.
 ]
 ```
-**1.6) Initialise database on Django**  
+#### 1.6) Initialise database on Django
 Django will use this database for all of its functionality.
 ```
 python manage.py migrate
 ```
-**1.7) Create a superuser account to be used for Django**  
+#### 1.7) Create a superuser account to be used for Django
 The superuser account will be used to access all admin section of Django. The admin section will greatly help you in developing your API.
 ```
 python manage.py createsuperuser
@@ -78,7 +79,7 @@ Superuser created successfully.
 ```
 
 ### Django framework
-**admin.py**  
+#### admin.py
 This file is required if you would like to manage your api using the django web UI. You can initialise your API with the following.
 ```sh
 from django.contrib import admin
@@ -86,9 +87,7 @@ from .models import (YourAPIModel)
 
 admin.site.register(**(YourAPIModel)**)
 ```
-
-
-**models.py**  
+#### models.py
 This file contains all models (Class/Entity) required for your API. You will declare your models here before importing to other files. In this case, I will be initialising the variable value to **VARCHAR** that have a byte size of 50 character. You can reference https://docs.djangoproject.com/en/4.2/topics/db/models/, for more details on django model.  
 ```sh
 from django.db import models
@@ -103,9 +102,7 @@ You will have to run **migrations** everytime you update your models
 ```sh
 python manage.py makemigrations
 ```
-
-
-**views.py**  
+#### views.py
 This file contain functions that will be executed when an API route is called.  
 ```sh
 from django.shortcuts import render
@@ -115,9 +112,7 @@ from django.http import JsonResponse
 async def testAPIViewSet(request):
     return JsonResponse({"Success": "API is online"})
 ```
-
-
-**urls.py**  
+#### urls.py
 This file contains the initialisation for url routing of API to their individual **views**.  
 ```sh
 from django.urls import include, path
@@ -132,13 +127,11 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 ```
-
-
-**serializers.py**  
+#### serializers.py
 This file converts all of your models to be represented in JSON format.
 
 
-**References:**  
+#### References:
 1) https://www.youtube.com/watch?v=i5JykvxUk_A&t=982s  
 2) https://awstip.com/use-django-rest-framework-without-creating-a-model-bee57357b214  
 3) https://medium.com/swlh/build-your-first-rest-api-with-django-rest-framework-e394e39a482c  
@@ -164,14 +157,12 @@ There are only 4 **ENGINE** types in django. https://docs.djangoproject.com/en/d
 3) 'django.db.backends.sqlite3'  
 4) 'django.db.backends.oracle'  
 
-**migrate**
+#### migrate
 Always run migrate if you have modified any databases.
 ```sh
 python manage.py migrate
 ```
-
-
-**Reference:**
+#### Reference:
 https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
 
 
