@@ -4,12 +4,23 @@ This page serves as a note for my API development and the content of this page i
 
 
 ## Table of Content
-|S/N     |Title                                                            |
-|--------|-----------------------------------------------------------------|
-|1       |[Type of APIs](#API-Comparison)                                  |
-|2       |[Setting up DJango](#Setup-Django)                               |
-|2.1     |[Executing DJango](#13-run-django)                               |
-|3       |[Changeing Database for DJango](#Changing-databases-for-django)  |
+|S/N     |Title                                                                              |
+|--------|-----------------------------------------------------------------------------------|
+|1       |[Type of APIs](#API-Comparison)                                                    |
+|2       |[Setting up DJango](#Setup-Django)                                                 |
+|2.1     |[Executing DJango](#13-run-django)                                                 |
+|3       |[Changeing Database for DJango](#Changing-databases-for-django)                    |
+|4       |[Setting up Flask](#setup-flask)                                                   |
+|4.1     |[Executing Flask](#execute-the-flask-program)                                      |
+|5       |[Postgresql Installation and Information](#postgresql)                             |
+|5.1     |[Connecting Postgresql with DJango](#changing-databases-for-django)                |
+|5.2     |[Connecting Postgresql with Flask](#installation-of-postgres-in-python)            |
+|5.3     |[Postgresql Forget User ID and Password](#postgresql-forgot-id-and-password)       |
+|5.4     |[Postgresql basic commands](#2-restart-postgresql)                                 |
+|6       |[CrateDB Concept](#cratedb)                                                        |
+|6.1     |[CrateDB Documentation](#crate-documentation)                                      |
+|6.2     |[CrateDB Local Installation](#cratedb-installtion)                                 |
+|6.2     |[Connecting to CrateDB using crate library](#connect-to-cratedb)
 
 ## API Comparison
 There are 3 frequently used APIs are coded in python, mainly ```DJango```, ```Flask Framework```, and ```Fast API```.  
@@ -170,19 +181,76 @@ https://www.enterprisedb.com/postgres-tutorials/how-use-postgresql-django
 If you ever require to modify locale for your django, you can get the list of locale here.
 https://database.guide/how-to-return-a-list-of-available-collations-in-postgresql/
 
+## Setup Flask
+### Install Flask
+Start off flask API with the installation of **Flask library** and no external installation is required for flask API.
+```sh
+python -m pip install Flask
+```
+
+### Initialise Flask
+Create a python file with the following lines. Ensure that you are using the correct interpreter.
+```sh
+from flask import Flask
+app = Flask(__name__)
+
+@app.route('/testAPI')
+def testAPI():
+    return {'Success': 'API is Online'}
+```
+
+### Execute the flask program.
+```sh
+python -m flask --app (Python File Name) run
+```
+After executing the above command, you will be able to observe the following message:
+```
+ * Serving Flask app 'TestFlask'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+```
+After which you may verify if your API is working. In this case, access ```http://127.0.0.1:5000/testAPI``` in your browser.
 
 ## Postgresql
 You may install postgresql and setup on your computer from https://www.postgresql.org/download/.  
 
 After downloading, the default user is ```postgres```. You may access the postgresql database using the following command.  
-Postgresql will be hosted on port ```5432`` on default.
 ```sh
 psql -U postgres
 ```
+Postgresql will be hosted on port ```5432`` by default.  
+
 You will be prompt for password afterwards.
 **Reference:**  
 1) https://www.microfocus.com/documentation/idol/IDOL_12_0/MediaServer/Guides/html/English/Content/Getting_Started/Configure/_TRN_Set_up_PostgreSQL.htm  
 
+### Installation of postgres in python
+Install postgresql library for python.
+```sh
+python -m install psycopg2
+```
+#### Connect to postgresql
+You can access to postgresql using the following few lines of code.
+```sh
+import psycopg2
+
+conn_pgs = psycopg2.connect(
+    host="<host_name>",
+    database="<database_name>",
+    user="postgres",
+    password="<password>"
+)
+
+cur = conn.cursor()
+cur.execute("Select * from TableName;")
+
+// Close database
+conn.commit()
+cur.close()
+conn.close
+```
 
 ## Postgresql Forgot ID and PASSWORD
 In the case where you have forgotten your postgresql password, you can change your password using the following method.
@@ -213,3 +281,57 @@ ALTER USER postgres WITH PASSWORD 'new password';
 
 **Reference:**  
 https://www.postgresqltutorial.com/postgresql-administration/postgresql-reset-password/
+
+## CrateDB
+There are a few types of crate service:  
+1) CrateDB Cloud: Crate is a remote database and thus you do not need to perform any installation.  
+2) CrateDB On-Premises: https://crate.io/download/thank-you (Download Link)  
+
+CrateDB allows your to partition your data using certain values of your selected columns. For instance, the use of  
+1) **CLUSTERED BY** is used to organise data within a shard;  
+2) **PARTITIONED BY** is used to determine which data is stored in a shard.  
+However, as of 1/6/2023, the downside of using **clustered by** and **partitioned by** is that you cannot declare a **primary key**.  
+
+A shard contains data of a table in rows and it may consist of storage size from 2GB to 30GB (recommended).  
+**References:**  
+1) https://crate.io/docs/crate/reference/en/5.3/general/ddl/partitioned-tables.html
+2) https://community.crate.io/t/sharding-and-partitioning-guide-for-time-series-data/737
+
+### Crate Documentation
+https://crate.io/docs/crate/reference/en/5.3/  
+
+### CrateDB Installtion
+Install crate library for python.
+```sh
+python -m install crate
+```
+### Running CrateDB On-Premises:
+```
+cd (Location Stored)/crate-(version)/
+```
+```
+./bin/crate
+```
+After the above it done, you can access your CrateDB UI through
+```
+http://127.0.0.1:4200/
+```
+
+### Connect to crateDB
+You can access to cratedb using the following few lines of code. If you are using the default access, the username should be **admin**.
+```sh
+from crate import client
+
+conn = client.connect("
+    <CrateDB given URL>:<CrateDB given port>", 
+    username="admin", 
+    password="<PASSWORD>", 
+    verify_ssl_cert=True)
+
+with conn:
+    cursor = conn.cursor()
+    cursor.execute("SELECT name FROM sys.cluster")
+    result = cursor.fetchone()
+    print(result)
+```
+Do remember that ```with``` will automatically close the database after exiting.  
