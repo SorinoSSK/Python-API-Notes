@@ -4,9 +4,9 @@ This page serves as a note for my API development and the content of this page i
 
 
 ## Table of Content
-|s/n-----|Title--------------------------|
+|s/n     |Title                          |
 |--------|-------------------------------|
-|1-------|[Type of APIs](#API-Comparison)|
+|1       |[Type of APIs](#API-Comparison)|
 
 ## API Comparison
 There are 3 frequently used APIs are coded in python, mainly ```DJango```, ```Flask Framework```, and ```Fast API```.  
