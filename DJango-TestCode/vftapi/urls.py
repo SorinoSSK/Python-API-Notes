@@ -11,5 +11,8 @@ router = routers.DefaultRouter()
 urlpatterns = [
     path('/', include(router.urls)),
     path('testapi/', views.testAPIViewSet),
+    path('getCrateDBCluster/', views.getCrateDBCluster),
+    path('streamSKTest/', views.streamSSESKTests),
+    path('api/iot_mgmt/orgs/3/projects/70/gateways/390/data_dump_index', views.getUnit9Data),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
