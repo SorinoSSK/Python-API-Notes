@@ -19,8 +19,8 @@ from rest_framework.decorators import action
 from crate import client
 
 url = 'https://vflowtech-test.aks1.eastus2.azure.cratedb.net:4200'
-ID = 'Refer To Private Note'
-PWD = 'Refer To Private Note'
+ID = 'admin'
+PWD = 'g3A5)GEhA8ZFiC$M$4(&h_Wk'
 headers = {
     'Accept': 'text/event-stream'
 }
