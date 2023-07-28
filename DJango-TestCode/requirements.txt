@@ -1,0 +1,7 @@
+django
+django-channels
+django-cors-headers
+djangorestframework
+crate
+psycopg2
+channels

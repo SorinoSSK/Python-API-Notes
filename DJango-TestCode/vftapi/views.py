@@ -19,8 +19,8 @@ from rest_framework.decorators import action
 from crate import client
 
 url = 'https://vflowtech-test.aks1.eastus2.azure.cratedb.net:4200'
-ID = 'Refer To Private Note'
-PWD = 'Refer To Private Note'
+ID = 'admin'
+PWD = 'g3A5)GEhA8ZFiC$M$4(&h_Wk'
 headers = {
     'Accept': 'text/event-stream'
 }
@@ -92,6 +92,20 @@ def onSteamingComplete(channelLayer):
 #         response = StreamingHttpResponse(stream_sse_events(cursor.fetchall()), content_type='text/event-stream')
 #         return response
 
+def chunk_sse_events(connQuery, chunkSize):
+    if (connQuery != None):
+        temp_ls=[]
+        querySize=len(connQuery)
+        for index, row in enumerate(connQuery):
+            temp_ls.append(row)
+            if len(temp_ls) >= chunkSize  or querySize == index+1:
+                yield 'data: {}\n\n'.format(temp_ls)
+                temp_ls=[]
+    yield 'data: completed'
+
+def formateData(connQuery):
+    if (connQuery != None):
+        yield {"data": json.loads(json.dumps(connQuery))}
 
 async def getUnit9Data(request): #, pageSize, pageNumber, toDate, fromDate
     pageSize = int(request.GET.get('page_size'))
@@ -100,19 +114,14 @@ async def getUnit9Data(request): #, pageSize, pageNumber, toDate, fromDate
     fromDate = request.GET.get('from_date')
     offset = pageSize*(pageNumber-1)
 
-    response = HttpResponse(content_type='text/event-stream')
-    response['Connection'] = 'keep-alive'
-    response['Cache-Control'] = 'no-cache'
-    response['x-Accel Buffering'] = 'no'
-
     conn = client.connect(url, username=ID, password=PWD, verify_ssl_cert=True)
     
-    chunk_size = 4096
     with conn:
         cursor = conn.cursor()
         query = "SELECT data FROM unitdata9 WHERE timestamp >= " + str(fromDate) + " AND " + str(toDate) + " LIMIT " + str(pageSize) + " offset " + str(offset) + ";"
         cursor.execute(query)
-        data = cursor.fetchall()
+        
+        # response = HttpResponse(content_type='text/event-stream')
 
-
+        response = StreamingHttpResponse(formateData(cursor.fetchall()))
         return response
