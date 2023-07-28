@@ -3,5 +3,5 @@ django-channels
 django-cors-headers
 djangorestframework
 crate
-psycopg2
+psycopg2-binary
 channels
