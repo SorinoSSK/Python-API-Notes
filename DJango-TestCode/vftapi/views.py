@@ -1,9 +1,30 @@
+import json
+import requests
+
 from django.shortcuts import render
-from rest_framework import viewsets
 from django.http import JsonResponse
+from django.http import HttpResponse
+from django.http import StreamingHttpResponse
+
+from channels.layers import get_channel_layer
+from channels.generic.websocket import AsyncWebsocketConsumer
+from asgiref.sync import async_to_sync
+import asyncio
+
+from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import action
+
+from crate import client
+
+url = 'https://vflowtech-test.aks1.eastus2.azure.cratedb.net:4200'
+ID = 'admin'
+PWD = 'g3A5)GEhA8ZFiC$M$4(&h_Wk'
+headers = {
+    'Accept': 'text/event-stream'
+}
+
 
 # from .serializers import TestAPISerializer
 # from .models import testApi
@@ -22,3 +43,85 @@ from rest_framework.decorators import action
 
 async def testAPIViewSet(request):
     return JsonResponse({"Success": "API is online"})
+
+async def getCrateDBCluster(request):
+    conn = client.connect(url, username=ID, password=PWD, verify_ssl_cert=True)
+
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM sys.cluster")
+        result = cursor.fetchone()
+    return JsonResponse({"Crate DB Cluster": result})
+
+def stream_sse_events(connQuery):
+    print(len(connQuery))
+    if (connQuery != None):
+        for row in connQuery:
+            # print(row);
+            yield 'data: {}\n\n'.format(row)
+    yield 'data: completed'
+
+async def streamSSESKTests(request):
+    conn = client.connect(url, username=ID, password=PWD, verify_ssl_cert=True)
+    with conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT person_id, person_name, person_description FROM sktest LIMIT 100;")
+        response = StreamingHttpResponse(stream_sse_events(cursor.fetchall()), content_type='text/plain')
+        return response
+    
+def onSteamingComplete(channelLayer):
+    async_to_sync(channelLayer.group_send)(
+        'EndOfLine',
+        {
+            'type': 'message',
+            'content': 'completed'
+        }
+    )
+
+# async def getUnit9Data(request): #, pageSize, pageNumber, toDate, fromDate
+#     pageSize = int(request.GET.get('page_size'))
+#     pageNumber = int(request.GET.get('page_number'))
+#     toDate = request.GET.get('to_date')
+#     fromDate = request.GET.get('from_date')
+#     offset = pageSize*(pageNumber-1)
+#     conn = client.connect(url, username=ID, password=PWD, verify_ssl_cert=True)
+#     with conn:
+#         cursor = conn.cursor()
+#         query = "SELECT data FROM unitdata9 WHERE timestamp >= " + str(fromDate) + " AND " + str(toDate) + " LIMIT " + str(pageSize) + " offset " + str(offset) + ";"
+#         cursor.execute(query)
+#         response = StreamingHttpResponse(stream_sse_events(cursor.fetchall()), content_type='text/event-stream')
+#         return response
+
+def chunk_sse_events(connQuery, chunkSize):
+    if (connQuery != None):
+        temp_ls=[]
+        querySize=len(connQuery)
+        for index, row in enumerate(connQuery):
+            temp_ls.append(row)
+            if len(temp_ls) >= chunkSize  or querySize == index+1:
+                yield 'data: {}\n\n'.format(temp_ls)
+                temp_ls=[]
+    yield 'data: completed'
+
+def formateData(connQuery):
+    if (connQuery != None):
+        yield {"data": json.loads(json.dumps(connQuery))}
+
+async def getUnit9Data(request): #, pageSize, pageNumber, toDate, fromDate
+    pageSize = int(request.GET.get('page_size'))
+    pageNumber = int(request.GET.get('page_number'))
+    toDate = request.GET.get('to_date')
+    fromDate = request.GET.get('from_date')
+    offset = pageSize*(pageNumber-1)
+
+    conn = client.connect(url, username=ID, password=PWD, verify_ssl_cert=True)
+    
+    with conn:
+        cursor = conn.cursor()
+        query = "SELECT data FROM unitdata9 WHERE timestamp >= " + str(fromDate) + " AND " + str(toDate) + " LIMIT " + str(pageSize) + " offset " + str(offset) + ";"
+        cursor.execute(query)
+        
+        # response = HttpResponse(content_type='text/event-stream')
+
+        response = StreamingHttpResponse(formateData(cursor.fetchall()))
+        return response
